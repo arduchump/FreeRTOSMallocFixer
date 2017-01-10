@@ -1,30 +1,24 @@
-# MallocFixer
+# FreeRTOSMallocFixer
 
-A malloc fixer for libc of Arduino
+A malloc fixer for libc of FreeRTOS on Arduino.
+
+We use a trick way to solve that problem.
 
 # Usage
 
-1\. Enable GCC multiple definitions feature
-
-Place a file "platform.local.txt" with content below to the path `"{ARDUINO_IDE}/hardware/arduino/avr"` (same directory with "platform.txt"):
+1\. Open "stdlib.h" in your toolchains and add codes beow
 
 ```
-compiler.c.extra_flags=-z muldefs
-compiler.c.elf.extra_flags=-z muldefs
-compiler.S.extra_flags=-z muldefs
-compiler.cpp.extra_flags=-z muldefs
-compiler.ar.extra_flags=
-compiler.objcopy.eep.extra_flags=
-compiler.elf2hex.extra_flags=
+extern void * _freeRTOSMallocFixer(size_t len);
+#define malloc _freeRTOSMallocFixer
 ```
 
-So that the complier won't complain that there have another malloc implementation inside libc.a
+So that all sources that use malloc in your project will be replaced by _freeRTOSMallocFixer(). That function provided thread-safe malloc()
 
-2\. Include these codes before setup() in your *.ino
+2\. Include this library in your *.ino
 
 ```
-#include <MallocFixer.h>        
-MALLOC_FIXER_IMPLEMEMTATION();
+#include <FreeRTOSMallocFixer.h>        
 ```
 
 3\. Recompile the project 

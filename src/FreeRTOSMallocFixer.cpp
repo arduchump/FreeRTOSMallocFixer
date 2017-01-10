@@ -1,4 +1,10 @@
-#include "MallocFixer.h"
+#include "FreeRTOSMallocFixer.h"
+
+#ifdef ARDUINO
+#include <Arduino_FreeRTOS.h>
+#else
+#include <FreeRTOS.h>
+#endif
 
 struct __freelist
 {
@@ -20,7 +26,7 @@ extern struct __freelist *__flp; /* freelist pointer (head of freelist) */
 }
 #endif
 
-void *
+static void *
 _mallocFixer(size_t len)
 {
   struct __freelist *fp1, *fp2, *sfp1, *sfp2;
@@ -125,6 +131,7 @@ _mallocFixer(size_t len)
     sfp2     = (struct __freelist *)cp;
     sfp2->sz = len;
     sfp1->sz = s - sizeof(size_t);
+
     return &(sfp2->nx);
   }
 
@@ -174,4 +181,18 @@ _mallocFixer(size_t len)
 //   * Step 4: There's no help, just fail. :-/
 //   */
 //  return 0;
+}
+
+void *
+_freeRTOSMallocFixer(size_t len)
+{
+  void *ret = NULL;
+
+  vTaskSuspendAll();
+  {
+    ret = _mallocFixer(len);
+  }
+  (void)xTaskResumeAll();
+
+  return ret;
 }
