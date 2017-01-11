@@ -6,6 +6,8 @@
 #include <FreeRTOS.h>
 #endif
 
+#include <stdlib.h>
+
 struct __freelist
 {
   size_t             sz;
@@ -21,6 +23,11 @@ extern char * __malloc_heap_start;
 extern char * __malloc_heap_end;
 extern char * __brkval;     /* first location not yet allocated */
 extern struct __freelist *__flp; /* freelist pointer (head of freelist) */
+
+// Use the normal free
+#ifdef free
+#undef free
+#endif
 
 #ifdef __cplusplus
 }
@@ -195,4 +202,12 @@ _freeRTOSMallocFixer(size_t len)
   (void)xTaskResumeAll();
 
   return ret;
+}
+
+void
+_freeRTOSFreeFixer(void *ptr)
+{
+  vTaskSuspendAll();
+  free(ptr);
+  xTaskResumeAll();
 }

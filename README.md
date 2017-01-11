@@ -6,19 +6,22 @@ We use a trick way to solve that problem.
 
 # Usage
 
-1\. Open "stdlib.h" in your toolchains and add codes beow
+1\. Put "patch/FreeRTOSMallocFixerForStdlib.h" to the same folder of "stdlib.h" in your toolchains
+
+2\. Include "FreeRTOSMallocFixerForStdlib.h" at the end of "stdlib.h"
 
 ```
-extern void * _freeRTOSMallocFixer(size_t len);
-#define malloc _freeRTOSMallocFixer
+#include "FreeRTOSMallocFixerForStdlib.h"
 ```
 
 So that all sources that use malloc in your project will be replaced by _freeRTOSMallocFixer(). That function provided thread-safe malloc()
 
-2\. Include this library in your *.ino
+3\. Put "patch/FreeRTOSMallocFixerHooks.c" to `"{ARDUINO_IDE}/hardware/arduino/avr/cores/arduino"`
+
+4\. Include this library in your *.ino to really take effect (otherwise it will use the origin malloc() and free()
 
 ```
 #include <FreeRTOSMallocFixer.h>        
 ```
 
-3\. Recompile the project 
+5\. Recompile the project 

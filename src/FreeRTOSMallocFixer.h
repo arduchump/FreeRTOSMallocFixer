@@ -11,6 +11,9 @@ extern "C"
 void *
 _freeRTOSMallocFixer(size_t len);
 
+void
+_freeRTOSFreeFixer(void *ptr);
+
 #ifdef __cplusplus
 };
 #endif
