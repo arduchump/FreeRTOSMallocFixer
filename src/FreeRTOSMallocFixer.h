@@ -14,6 +14,11 @@ _freeRTOSMallocFixer(size_t len);
 void
 _freeRTOSFreeFixer(void *ptr);
 
+void *
+_freeRTOSCallocFixer(size_t nmemb, size_t size);
+void *
+_freeRTOSReallocFixer(void *ptr, size_t len);
+
 #ifdef __cplusplus
 };
 #endif
