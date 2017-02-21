@@ -22,7 +22,7 @@ We use a trick way to solve that problem.
 
 So that all sources that use malloc in your project will be replaced by _freeRTOSMallocFixer(). That function provided thread-safe malloc()
 
-3\. Put "patch/FreeRTOSMallocFixerHooks.c" to `"{ARDUINO_IDE}/hardware/arduino/avr/cores/arduino"`
+3\. Put "patch/FreeRTOSMallocFixerHooks.cpp" to `"{ARDUINO_IDE}/hardware/arduino/avr/cores/arduino"`
 
 4\. Include this library in your *.ino to really take effect (otherwise it will use the origin malloc() and free()
 
