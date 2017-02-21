@@ -6,7 +6,6 @@
 #include <FreeRTOS.h>
 #endif
 
-#include <stdlib.h>
 #include <string.h>
 
 struct __freelist
@@ -386,4 +385,60 @@ _freeRTOSReallocFixer(void *ptr, size_t len)
   xTaskResumeAll();
 
   return ptr;
+}
+
+FILE *
+_freeRTOSFdevopenFixer(int (*putFunc)(char, FILE *), int (*getFunc)(FILE *))
+{
+  FILE *s;
+
+  if((NULL == putFunc) && (NULL == getFunc))
+  {
+    return 0;
+  }
+
+  s = static_cast<FILE *>(_freeRTOSCallocFixer(1, sizeof(FILE)));
+
+  if(s == 0)
+  {
+    return 0;
+  }
+
+  uint8_t flags = 0;
+
+  if(putFunc)
+  {
+    flags |= _FDEV_SETUP_WRITE;
+  }
+
+  if(getFunc)
+  {
+    flags |= _FDEV_SETUP_READ;
+  }
+
+  fdev_setup_stream(s, putFunc, getFunc, flags);
+
+  // If standard input/output does not existed, we override them.
+  if(getFunc)
+  {
+    if(NULL == stdin)
+    {
+      stdin = s;
+    }
+  }
+
+  if(putFunc)
+  {
+    if(NULL == stdout)
+    {
+      stdout = s;
+    }
+
+    if(NULL == stderr)
+    {
+      stderr = s;
+    }
+  }
+
+  return s;
 }
